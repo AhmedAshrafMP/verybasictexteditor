@@ -7,6 +7,8 @@ practicing the abstraction of text manipulation module from the user interface m
 - react
 - javascript
 
+
+## How to run
 ```bash
 npm run start
 ```
