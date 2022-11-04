@@ -1,47 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 import TextHandler from './handlers/TextHandler';
 import CursorHandler from './handlers/CursorHandler';
 let currenText = "";
 const textHandlerInstance = new TextHandler(currenText);
-const cursorHanlderInstance = new CursorHandler(0);
-let cursorPosition = 0;
+const cursorInstance = new CursorHandler(0);
 
 function App() {
 
   const textareaRef = React.useRef();
-  const [text, setText] = React.useState("");
   const [, updateState] = React.useState();
+
+
   const refreshComponent = React.useCallback(() => {
     textareaRef.current.value = textHandlerInstance.getText()
     if (textareaRef) {
       textareaRef.current.setSelectionRange(
-        cursorHanlderInstance.getCursotPosition(),
-        cursorHanlderInstance.getCursotPosition()
+        cursorInstance.getCursotPosition(),
+        cursorInstance.getCursotPosition()
       )
     }
+    /**
+    * force update the component to re-render textarea with new values
+    */
     updateState({})
   }, []);
 
   const onKeyUp = (e) => {
+    const { key } = e;
     e.preventDefault();
-    const { nativeEvent, target, key } = e;
 
     if (key === "Backspace") {
-      cursorHanlderInstance.onCursorMoveTo(
+      cursorInstance.onCursorMoveTo(
         textHandlerInstance.removeStringOnPosition(
-          cursorHanlderInstance.getCursotPosition(),
+          cursorInstance.getCursotPosition(),
           1
         )
       );
     } else if (key.includes("Arrow")) {
-      cursorHanlderInstance.onCursorMoveTo(
-        cursorHanlderInstance.getCursotPosition() + (key === "ArrowLeft" ? -1 : 1)
-      );
+      cursorInstance.onArrowsPress(key);
     } else {
-      cursorHanlderInstance.onCursorMoveTo(
-        textHandlerInstance.addStringOnPosition(key, cursorHanlderInstance.getCursotPosition())
+      cursorInstance.onCursorMoveTo(
+        textHandlerInstance.addStringOnPosition(key, cursorInstance.getCursotPosition())
       );
     }
 
@@ -54,6 +53,7 @@ function App() {
     <div className="App">
       <textarea
         ref={textareaRef}
+        value={textHandlerInstance.getText()}
         onKeyDown={(e) => onKeyUp(e)} style={{
           width: "100vh",
           height: "100vh",
